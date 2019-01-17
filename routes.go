@@ -12,6 +12,10 @@ type Server struct {
 	router *mux.Router
 }
 
+func someFunc() {
+
+}
+
 /*func (s *Server) routes() {
 	s.router.HandleFunc("/")
 }*/
