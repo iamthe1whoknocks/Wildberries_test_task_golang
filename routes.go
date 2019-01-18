@@ -19,6 +19,7 @@ type Server struct {
 
 //Routes is function to avoid big routes in main.go
 func (s *Server) Routes() {
+	s.router.StrictSlash(true)
 	s.router.HandleFunc("/", s.IndexHandler())
 
 	subRoute := s.router.PathPrefix("/api/v1/").Subrouter()

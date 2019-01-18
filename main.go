@@ -29,7 +29,7 @@ func main() {
 
 	fmt.Println("Connected to DB")
 
-	myRouter := mux.NewRouter().StrictSlash(true)
+	myRouter := mux.NewRouter()
 
 	myServer := &Server{
 		db:     myDb,

@@ -1,0 +1,29 @@
+[33mcommit 13cca9c36212889b40a847fc2cafa7304a56ab66[m[33m ([m[1;36mHEAD -> [m[1;32mGoodLook[m[33m)[m
+Author: Dimka <dimka@mail.com>
+Date:   Fri Jan 18 22:25:46 2019 +0200
+
+    v 1.2
+
+[33mcommit 5b3f7d22a58f5baa69d43429ab84ed198657e582[m
+Author: Dimka <dimka@mail.com>
+Date:   Fri Jan 18 21:38:19 2019 +0200
+
+    v 1.2
+
+[33mcommit d117807a1495fd0fb4632d15570779a411ceb6b9[m
+Author: Dimka <dimka@mail.com>
+Date:   Fri Jan 18 21:36:13 2019 +0200
+
+    v 1.2 included deleted config.json
+
+[33mcommit 2550bd7dd279dac214e4e70760b94b2a2c6b4535[m
+Author: Dimka <dimka@mail.com>
+Date:   Fri Jan 18 21:32:00 2019 +0200
+
+    v. 1.1
+
+[33mcommit d3d723e2d1049f242810e245946a2aead62110c8[m[33m ([m[1;33mtag: v1.0[m[33m)[m
+Author: Dimka <dimka@mail.com>
+Date:   Thu Jan 17 22:46:52 2019 +0200
+
+    v. 1.0 handlers and routes in main
