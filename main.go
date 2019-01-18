@@ -2,13 +2,10 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 
-	"io/ioutil"
 	"net/http"
 	"os"
-	"strconv"
 
 	"golang+postgres/models"
 
@@ -16,8 +13,6 @@ import (
 
 	_ "github.com/lib/pq"
 )
-
-
 
 func checkError(err error) {
 	if err != nil {
@@ -33,16 +28,15 @@ func main() {
 	}
 	fmt.Println("Connected to DB")
 
-
 	if err != nil {
 		fmt.Println(err, "exiting programm")
 		os.Exit(1)
 	}
 	myRouter := mux.NewRouter().StrictSlash(true)
-	
+
 	myServer := &Server{
-		db: myDb,
-		router:myRouter
+		db:     myDb,
+		router: myRouter,
 	}
 	myServer.Routes()
 
@@ -56,7 +50,6 @@ func main() {
 }
 
 // IndexHandler does...
-
 
 //curl -d {"txt":"cheers"} -H "Content-Type: application/json" -X POST http://127.0.0.1:8080/api/v1/user/5/comment/
 //у некоторых роутов могут быть 2 метода!!!
