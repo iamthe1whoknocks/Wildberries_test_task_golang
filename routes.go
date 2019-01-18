@@ -17,6 +17,7 @@ type Server struct {
 	router *mux.Router
 }
 
+//Routes is function to avoid big routes in main.go
 func (s *Server) Routes() {
 	s.router.HandleFunc("/", s.IndexHandler())
 
@@ -35,6 +36,7 @@ func (s *Server) Routes() {
 
 }
 
+//IndexHandler is a handler of index page
 func (s *Server) IndexHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("HELLO!"))
