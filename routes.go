@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/prometheus/client_golang/prometheus"
+
 	"github.com/gorilla/mux"
 )
 
@@ -19,8 +21,11 @@ type Server struct {
 
 //Routes is function to avoid big routes in main.go
 func (s *Server) Routes() {
+
 	s.router.StrictSlash(true)
+	s.router.NotFoundHandler = http.HandlerFunc(notFound)
 	s.router.HandleFunc("/", s.IndexHandler())
+	s.router.Handle("/metrics", prometheus.Handler())
 
 	subRoute := s.router.PathPrefix("/api/v1/").Subrouter()
 	subRoute.HandleFunc("/comment/{commentID:[0-9]+}", s.CommentHandler()).Methods("GET", "PUT", "DELETE")
@@ -40,6 +45,7 @@ func (s *Server) Routes() {
 //IndexHandler is a handler of index page
 func (s *Server) IndexHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		totalReq.WithLabelValues("200", r.URL.String(), r.Method).Inc()
 		w.Write([]byte("HELLO!"))
 	}
 }
@@ -50,8 +56,10 @@ func (s *Server) GetUserCommentHandler() http.HandlerFunc {
 		if r.Method != "GET" {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			http.Error(w, http.StatusText(405), 405)
+			totalReq.WithLabelValues("405", r.URL.String(), r.Method).Inc()
 			return
 		}
+		totalReq.WithLabelValues("200", r.URL.String(), r.Method).Inc()
 		vars := mux.Vars(r)
 		userID := vars["userID"]
 		commentID := vars["commentID"]
@@ -84,6 +92,7 @@ func (s *Server) UserHandler() http.HandlerFunc {
 		switch r.Method {
 
 		case "GET":
+			totalReq.WithLabelValues("200", r.URL.String(), r.Method).Inc()
 			vars := mux.Vars(r)
 			userID := vars["userID"]
 			userIDInt, err := strconv.Atoi(userID)
@@ -101,6 +110,7 @@ func (s *Server) UserHandler() http.HandlerFunc {
 			w.Write(b)
 
 		case "DELETE":
+			totalReq.WithLabelValues("200", r.URL.String(), r.Method).Inc()
 			vars := mux.Vars(r)
 			userID := vars["userID"]
 			userIDInt, err := strconv.Atoi(userID)
@@ -112,6 +122,7 @@ func (s *Server) UserHandler() http.HandlerFunc {
 			w.Write(b)
 
 		case "PUT":
+			totalReq.WithLabelValues("200", r.URL.String(), r.Method).Inc()
 			vars := mux.Vars(r)
 
 			userID := vars["userID"]
@@ -132,6 +143,7 @@ func (s *Server) UserHandler() http.HandlerFunc {
 		default:
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			http.Error(w, http.StatusText(405), 405)
+			totalReq.WithLabelValues("405", r.URL.String(), r.Method).Inc()
 			return
 		}
 	}
@@ -143,6 +155,7 @@ func (s *Server) UserCommentHandler() http.HandlerFunc {
 		switch r.Method {
 
 		case "GET":
+			totalReq.WithLabelValues("200", r.URL.String(), r.Method).Inc()
 			vars := mux.Vars(r)
 			userID := vars["userID"]
 			userIDInt, err := strconv.Atoi(userID)
@@ -160,6 +173,7 @@ func (s *Server) UserCommentHandler() http.HandlerFunc {
 			w.Header().Set("Content-Type", "application/json")
 			w.Write(b)
 		case "POST":
+			totalReq.WithLabelValues("200", r.URL.String(), r.Method).Inc()
 			vars := mux.Vars(r)
 			userID := vars["userID"]
 			userIDInt, err := strconv.Atoi(userID)
@@ -175,6 +189,7 @@ func (s *Server) UserCommentHandler() http.HandlerFunc {
 		default:
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			http.Error(w, http.StatusText(405), 405)
+			totalReq.WithLabelValues("405", r.URL.String(), r.Method).Inc()
 			return
 
 		}
@@ -184,12 +199,14 @@ func (s *Server) UserCommentHandler() http.HandlerFunc {
 //GetAllCommentHandler does...
 func (s *Server) GetAllCommentHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
 		if r.Method != "GET" {
+			totalReq.WithLabelValues("405", r.URL.String(), r.Method).Inc()
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			http.Error(w, http.StatusText(405), 405)
 			return
 		}
-
+		totalReq.WithLabelValues("200", r.URL.String(), r.Method).Inc()
 		b, err := models.GetUserComment(s.db, 0, 0)
 		if err != nil {
 			fmt.Println(err, "nothing get")
@@ -209,6 +226,7 @@ func (s *Server) CommentHandler() http.HandlerFunc {
 		switch r.Method {
 
 		case "DELETE":
+			totalReq.WithLabelValues("200", r.URL.String(), r.Method).Inc()
 			vars := mux.Vars(r)
 			commentID := vars["commentID"]
 			commentIDInt, err := strconv.Atoi(commentID)
@@ -220,6 +238,7 @@ func (s *Server) CommentHandler() http.HandlerFunc {
 			w.Write(b)
 
 		case "PUT":
+			totalReq.WithLabelValues("200", r.URL.String(), r.Method).Inc()
 			vars := mux.Vars(r)
 			commentID := vars["commentID"]
 			commentIDInt, err := strconv.Atoi(commentID)
@@ -234,6 +253,7 @@ func (s *Server) CommentHandler() http.HandlerFunc {
 			w.Write(b)
 
 		case "GET":
+			totalReq.WithLabelValues("200", r.URL.String(), r.Method).Inc()
 			vars := mux.Vars(r)
 			commentID := vars["commentID"]
 			commentIDInt, err := strconv.Atoi(commentID)
@@ -253,21 +273,21 @@ func (s *Server) CommentHandler() http.HandlerFunc {
 		default:
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			http.Error(w, http.StatusText(405), 405)
+			totalReq.WithLabelValues("405", r.URL.String(), r.Method).Inc()
 			return
 		}
 	}
 }
-
-//DelUserHandler does....
 
 //PostUserHandler does...
 func (s *Server) PostUserHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
 			http.Error(w, http.StatusText(405), 405)
+			totalReq.WithLabelValues("405", r.URL.String(), r.Method).Inc()
 			return
 		}
-
+		totalReq.WithLabelValues("200", r.URL.String(), r.Method).Inc()
 		buf := make([]byte, 0)
 		buf, err := ioutil.ReadAll(r.Body)
 		if err != nil {
@@ -281,4 +301,9 @@ func (s *Server) PostUserHandler() http.HandlerFunc {
 		w.Write(b)
 
 	}
+}
+
+func notFound(w http.ResponseWriter, r *http.Request) {
+	totalReq.WithLabelValues("404", r.URL.String(), r.Method).Inc()
+	fmt.Fprint(w, "Custom 404 Page not found")
 }
