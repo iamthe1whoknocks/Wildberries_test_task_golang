@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 
@@ -45,8 +46,12 @@ func (s *Server) Routes() {
 //IndexHandler is a handler of index page
 func (s *Server) IndexHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
 		totalReq.WithLabelValues("200", r.URL.String(), r.Method).Inc()
+		duration := time.Since(start)
+		reqDuration.WithLabelValues("200", r.URL.String(), r.Method).Observe(float64(duration.Nanoseconds()))
 		w.Write([]byte("HELLO!"))
+
 	}
 }
 
@@ -59,6 +64,7 @@ func (s *Server) GetUserCommentHandler() http.HandlerFunc {
 			totalReq.WithLabelValues("405", r.URL.String(), r.Method).Inc()
 			return
 		}
+		start := time.Now()
 		totalReq.WithLabelValues("200", r.URL.String(), r.Method).Inc()
 		vars := mux.Vars(r)
 		userID := vars["userID"]
@@ -81,8 +87,11 @@ func (s *Server) GetUserCommentHandler() http.HandlerFunc {
 			w.Write([]byte("Cant find comment with such params"))
 		}
 
+		duration := time.Since(start)
+		reqDuration.WithLabelValues("200", r.URL.String(), r.Method).Observe(float64(duration.Nanoseconds()))
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(b)
+
 	}
 }
 
@@ -92,6 +101,7 @@ func (s *Server) UserHandler() http.HandlerFunc {
 		switch r.Method {
 
 		case "GET":
+			start := time.Now()
 			totalReq.WithLabelValues("200", r.URL.String(), r.Method).Inc()
 			vars := mux.Vars(r)
 			userID := vars["userID"]
@@ -106,10 +116,13 @@ func (s *Server) UserHandler() http.HandlerFunc {
 			if b == nil {
 				w.Write([]byte("Cant find user with such params"))
 			}
+			duration := time.Since(start)
+			reqDuration.WithLabelValues("200", r.URL.String(), r.Method).Observe(float64(duration.Nanoseconds()))
 			w.Header().Set("Content-Type", "application/json")
 			w.Write(b)
 
 		case "DELETE":
+			start := time.Now()
 			totalReq.WithLabelValues("200", r.URL.String(), r.Method).Inc()
 			vars := mux.Vars(r)
 			userID := vars["userID"]
@@ -118,10 +131,13 @@ func (s *Server) UserHandler() http.HandlerFunc {
 				fmt.Println(err)
 			}
 			b, err := models.DelUser(s.db, userIDInt)
+			duration := time.Since(start)
+			reqDuration.WithLabelValues("200", r.URL.String(), r.Method).Observe(float64(duration.Nanoseconds()))
 			w.Header().Set("Content-Type", "application/json")
 			w.Write(b)
 
 		case "PUT":
+			start := time.Now()
 			totalReq.WithLabelValues("200", r.URL.String(), r.Method).Inc()
 			vars := mux.Vars(r)
 
@@ -136,6 +152,9 @@ func (s *Server) UserHandler() http.HandlerFunc {
 			defer r.Body.Close()
 
 			b, err := models.PutUser(s.db, userIDInt, buf)
+
+			duration := time.Since(start)
+			reqDuration.WithLabelValues("200", r.URL.String(), r.Method).Observe(float64(duration.Nanoseconds()))
 
 			w.Header().Set("Content-Type", "application/json")
 			w.Write(b)
@@ -155,6 +174,7 @@ func (s *Server) UserCommentHandler() http.HandlerFunc {
 		switch r.Method {
 
 		case "GET":
+			start := time.Now()
 			totalReq.WithLabelValues("200", r.URL.String(), r.Method).Inc()
 			vars := mux.Vars(r)
 			userID := vars["userID"]
@@ -170,9 +190,12 @@ func (s *Server) UserCommentHandler() http.HandlerFunc {
 			if b == nil {
 				w.Write([]byte("Cant find comment with such params"))
 			}
+			duration := time.Since(start)
+			reqDuration.WithLabelValues("200", r.URL.String(), r.Method).Observe(float64(duration.Nanoseconds()))
 			w.Header().Set("Content-Type", "application/json")
 			w.Write(b)
 		case "POST":
+			start := time.Now()
 			totalReq.WithLabelValues("200", r.URL.String(), r.Method).Inc()
 			vars := mux.Vars(r)
 			userID := vars["userID"]
@@ -184,6 +207,8 @@ func (s *Server) UserCommentHandler() http.HandlerFunc {
 			buf, err = ioutil.ReadAll(r.Body)
 			defer r.Body.Close()
 			b, err := models.PostComment(s.db, userIDInt, buf)
+			duration := time.Since(start)
+			reqDuration.WithLabelValues("200", r.URL.String(), r.Method).Observe(float64(duration.Nanoseconds()))
 			w.Header().Set("Content-Type", "application/json")
 			w.Write(b)
 		default:
@@ -206,6 +231,7 @@ func (s *Server) GetAllCommentHandler() http.HandlerFunc {
 			http.Error(w, http.StatusText(405), 405)
 			return
 		}
+		start := time.Now()
 		totalReq.WithLabelValues("200", r.URL.String(), r.Method).Inc()
 		b, err := models.GetUserComment(s.db, 0, 0)
 		if err != nil {
@@ -214,7 +240,8 @@ func (s *Server) GetAllCommentHandler() http.HandlerFunc {
 		if b == nil {
 			w.Write([]byte("Cant find user with such params"))
 		}
-
+		duration := time.Since(start)
+		reqDuration.WithLabelValues("200", r.URL.String(), r.Method).Observe(float64(duration.Nanoseconds()))
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(b)
 	}
@@ -226,6 +253,7 @@ func (s *Server) CommentHandler() http.HandlerFunc {
 		switch r.Method {
 
 		case "DELETE":
+			start := time.Now()
 			totalReq.WithLabelValues("200", r.URL.String(), r.Method).Inc()
 			vars := mux.Vars(r)
 			commentID := vars["commentID"]
@@ -233,11 +261,16 @@ func (s *Server) CommentHandler() http.HandlerFunc {
 			if err != nil {
 				fmt.Println(err)
 			}
+
 			b, err := models.DelComment(s.db, commentIDInt)
+
+			duration := time.Since(start)
+			reqDuration.WithLabelValues("200", r.URL.String(), r.Method).Observe(float64(duration.Nanoseconds()))
 			w.Header().Set("Content-Type", "application/json")
 			w.Write(b)
 
 		case "PUT":
+			start := time.Now()
 			totalReq.WithLabelValues("200", r.URL.String(), r.Method).Inc()
 			vars := mux.Vars(r)
 			commentID := vars["commentID"]
@@ -249,10 +282,15 @@ func (s *Server) CommentHandler() http.HandlerFunc {
 			buf, err = ioutil.ReadAll(r.Body)
 			defer r.Body.Close()
 			b, err := models.PutComment(s.db, commentIDInt, buf)
+
+			duration := time.Since(start)
+			reqDuration.WithLabelValues("200", r.URL.String(), r.Method).Observe(float64(duration.Nanoseconds()))
+
 			w.Header().Set("Content-Type", "application/json")
 			w.Write(b)
 
 		case "GET":
+			start := time.Now()
 			totalReq.WithLabelValues("200", r.URL.String(), r.Method).Inc()
 			vars := mux.Vars(r)
 			commentID := vars["commentID"]
@@ -267,6 +305,10 @@ func (s *Server) CommentHandler() http.HandlerFunc {
 			if b == nil {
 				w.Write([]byte("Cant find user with such params"))
 			}
+
+			duration := time.Since(start)
+			reqDuration.WithLabelValues("200", r.URL.String(), r.Method).Observe(float64(duration.Nanoseconds()))
+
 			w.Header().Set("Content-Type", "application/json")
 			w.Write(b)
 
@@ -287,6 +329,7 @@ func (s *Server) PostUserHandler() http.HandlerFunc {
 			totalReq.WithLabelValues("405", r.URL.String(), r.Method).Inc()
 			return
 		}
+		start := time.Now()
 		totalReq.WithLabelValues("200", r.URL.String(), r.Method).Inc()
 		buf := make([]byte, 0)
 		buf, err := ioutil.ReadAll(r.Body)
@@ -296,6 +339,9 @@ func (s *Server) PostUserHandler() http.HandlerFunc {
 		defer r.Body.Close()
 
 		b, err := models.PostUser(s.db, buf)
+
+		duration := time.Since(start)
+		reqDuration.WithLabelValues("200", r.URL.String(), r.Method).Observe(float64(duration.Nanoseconds()))
 
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(b)
