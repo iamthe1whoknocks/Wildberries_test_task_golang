@@ -1,1 +1,1 @@
-{"port":5432,"endpoint":"api","host":"localhost","user":"postgres","password":"lobzik92","schema":"test","dbname":"testdb"}
+{"port":5432,"endpoint":"api","host":"localhost","user":"****","password":"******","schema":"test","dbname":"testdb"}
