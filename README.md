@@ -1,5 +1,4 @@
-# Wildberries_test_task_golang
-Тестовое задание по Golang + Postgresql
+
 
 ## Задание (Golang + PostgreSQL)
 
