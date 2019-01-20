@@ -46,7 +46,7 @@ type dbConfig struct {
 
 //GetConnectionString parses config file into struct
 func GetConnectionString(filename string) string {
-	confFile, err := os.Open("config.json")
+	confFile, err := os.Open("configuration.json")
 	checkError(err)
 
 	b, err := ioutil.ReadAll(confFile)
