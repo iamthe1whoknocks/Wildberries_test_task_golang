@@ -23,7 +23,7 @@ func checkError(err error) {
 
 func main() {
 	//getting database connection
-	myDb, err := models.NewDB(models.GetConnectionString("config.json"))
+	myDb, err := models.NewDB(models.GetConnectionString("configuration.json"))
 	if err != nil {
 		fmt.Println(err, "exiting programm")
 		os.Exit(1)
