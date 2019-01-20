@@ -20,6 +20,7 @@ type Server struct {
 	router *mux.Router
 }
 
+<<<<<<< HEAD
 //Routes is function to avoid big routes in main.go
 func (s *Server) Routes() {
 
@@ -353,3 +354,4 @@ func notFound(w http.ResponseWriter, r *http.Request) {
 	totalReq.WithLabelValues("404", r.URL.String(), r.Method).Inc()
 	fmt.Fprint(w, "Custom 404 Page not found")
 }
+
