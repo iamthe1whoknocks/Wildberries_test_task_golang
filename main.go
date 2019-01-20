@@ -14,6 +14,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
+//short error checking
 func checkError(err error) {
 	if err != nil {
 		fmt.Println(err)
@@ -21,6 +22,7 @@ func checkError(err error) {
 }
 
 func main() {
+	//getting database connection
 	myDb, err := models.NewDB(models.GetConnectionString("config.json"))
 	if err != nil {
 		fmt.Println(err, "exiting programm")

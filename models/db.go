@@ -1,3 +1,4 @@
+//Logic of working with database
 package models
 
 import (
@@ -8,13 +9,14 @@ import (
 	"os"
 )
 
+//checking error
 func checkError(err error) {
 	if err != nil {
 		fmt.Println(err)
 	}
 }
 
-//NewDB does....
+//NewDB checks connection to DB from config file and returns sql.DB
 func NewDB(datasourse string) (*sql.DB, error) {
 	db, err := sql.Open("postgres", datasourse)
 	if err != nil {
@@ -30,6 +32,7 @@ func NewDB(datasourse string) (*sql.DB, error) {
 	return db, nil
 }
 
+//struct to parse config file
 type dbConfig struct {
 	Port     int    `json:"port"`     //порт, на котором слушать запросы
 	Endpoint string `json:"endpoint"` //название API
@@ -41,7 +44,7 @@ type dbConfig struct {
 
 }
 
-//GetConnectionString does....
+//GetConnectionString parses config file into struct
 func GetConnectionString(filename string) string {
 	confFile, err := os.Open("config.json")
 	checkError(err)
@@ -56,7 +59,7 @@ func GetConnectionString(filename string) string {
 	return connectionStr
 }
 
-//GetUserComment does..
+//GetUserComment refers to Postgresql function test.user_comment_get.
 func GetUserComment(db *sql.DB, userID int, commentID int) (jsonString []byte, err error) {
 	rows, err := db.Query("Select * from test.user_comment_get($1,$2)", userID, commentID)
 	if err != nil {
@@ -75,7 +78,7 @@ func GetUserComment(db *sql.DB, userID int, commentID int) (jsonString []byte, e
 	return byteStr, nil
 }
 
-//GetUser does...
+//GetUser refers to Postgresql function test.user_get.
 func GetUser(db *sql.DB, userID int) (jsonString []byte, err error) {
 	rows, err := db.Query("Select * from test.user_get($1)", userID)
 	if err != nil {
@@ -94,7 +97,7 @@ func GetUser(db *sql.DB, userID int) (jsonString []byte, err error) {
 	return byteStr, nil
 }
 
-//GetComment does....
+//GetComment refers to Postgresql function test.comment_get.
 func GetComment(db *sql.DB, commentID int) (jsonString []byte, err error) {
 	rows, err := db.Query("Select * from test.comment_get($1)", commentID)
 	if err != nil {
@@ -113,7 +116,7 @@ func GetComment(db *sql.DB, commentID int) (jsonString []byte, err error) {
 	return byteStr, nil
 }
 
-//PostComment does....
+//PostComment refers to Postgresql function test.user_comment_ins.
 func PostComment(db *sql.DB, userID int, body []byte) (jsonString []byte, err error) {
 
 	rows, err := db.Query("Select * from test.user_comment_ins($1,$2)", userID, string(body))
@@ -134,7 +137,7 @@ func PostComment(db *sql.DB, userID int, body []byte) (jsonString []byte, err er
 	return byteStr, nil
 }
 
-//PutComment does....
+//PutComment refers to Postgresql function test.comment_upd.
 func PutComment(db *sql.DB, commentID int, body []byte) (jsonString []byte, err error) {
 
 	rows, err := db.Query("Select * from test.comment_upd($1,$2)", commentID, string(body[:]))
@@ -155,7 +158,7 @@ func PutComment(db *sql.DB, commentID int, body []byte) (jsonString []byte, err 
 	return byteStr, nil
 }
 
-//DelComment does....
+//DelComment refers to Postgresql function test.comment_del.
 func DelComment(db *sql.DB, commentID int) (jsonString []byte, err error) {
 
 	rows, err := db.Query("Select * from test.comment_del($1)", commentID)
@@ -176,7 +179,7 @@ func DelComment(db *sql.DB, commentID int) (jsonString []byte, err error) {
 	return byteStr, nil
 }
 
-//DelUser does....
+//DelUser refers to Postgresql function test.user_del.
 func DelUser(db *sql.DB, userID int) (jsonString []byte, err error) {
 
 	rows, err := db.Query("Select * from test.user_del($1)", userID)
@@ -197,7 +200,7 @@ func DelUser(db *sql.DB, userID int) (jsonString []byte, err error) {
 	return byteStr, nil
 }
 
-//PostUser does....
+//PostUser refers to Postgresql function test.user_ins.
 func PostUser(db *sql.DB, body []byte) (jsonString []byte, err error) {
 
 	rows, err := db.Query("Select * from test.user_ins($1)", body)
@@ -218,7 +221,7 @@ func PostUser(db *sql.DB, body []byte) (jsonString []byte, err error) {
 	return byteStr, nil
 }
 
-//PutUser does....
+//PutUser refers to Postgresql function test.user_upd.
 func PutUser(db *sql.DB, userID int, body []byte) (jsonString []byte, err error) {
 
 	rows, err := db.Query("Select * from test.user_upd($1,$2)", userID, string(body[:]))

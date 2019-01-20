@@ -14,7 +14,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-//Server does...
+//Server struct
 type Server struct {
 	db     *sql.DB
 	router *mux.Router
@@ -55,7 +55,7 @@ func (s *Server) IndexHandler() http.HandlerFunc {
 	}
 }
 
-//GetUserCommentHandler does...
+//GetUserCommentHandler handles /user/{userID:[0-9]+}/comment/{commentID:[0-9]+} path.
 func (s *Server) GetUserCommentHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
@@ -95,7 +95,7 @@ func (s *Server) GetUserCommentHandler() http.HandlerFunc {
 	}
 }
 
-//UserHandler does...
+//UserHandler handles /user/{userID:[0-9]+} path
 func (s *Server) UserHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
@@ -168,7 +168,7 @@ func (s *Server) UserHandler() http.HandlerFunc {
 	}
 }
 
-//UserCommentHandler does...
+//UserCommentHandler handles /user/{userID:[0-9]+}/comment/ path
 func (s *Server) UserCommentHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
@@ -221,7 +221,7 @@ func (s *Server) UserCommentHandler() http.HandlerFunc {
 	}
 }
 
-//GetAllCommentHandler does...
+//GetAllCommentHandler handles /user/comment/ path
 func (s *Server) GetAllCommentHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
@@ -247,7 +247,7 @@ func (s *Server) GetAllCommentHandler() http.HandlerFunc {
 	}
 }
 
-//CommentHandler does....
+//CommentHandler handles /comment/{commentID:[0-9]+} path.
 func (s *Server) CommentHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
@@ -321,7 +321,7 @@ func (s *Server) CommentHandler() http.HandlerFunc {
 	}
 }
 
-//PostUserHandler does...
+//PostUserHandler handles /user/ path.
 func (s *Server) PostUserHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
@@ -349,6 +349,7 @@ func (s *Server) PostUserHandler() http.HandlerFunc {
 	}
 }
 
+//custom 404 page,it was made to collect metrics from 404 page
 func notFound(w http.ResponseWriter, r *http.Request) {
 	totalReq.WithLabelValues("404", r.URL.String(), r.Method).Inc()
 	fmt.Fprint(w, "Custom 404 Page not found")
